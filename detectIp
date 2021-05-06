@@ -1,0 +1,11 @@
+#!/bin/bash
+for i in 10.200.16.{1..254}
+do
+   ping -c 2 -w 2 $i  >/dev/null
+   if [  $? -eq 0 ]
+   then 
+   echo $i is ok! >>./ip_ok.txt
+   else
+   echo $i is down ! >>./ip_down.txt
+   fi
+done

@@ -1,0 +1,107 @@
+#!/bin/bash
+usage(){
+echo "#################################################################         "
+echo "     查看帮助文档                   -->   ftool -h                        "       
+echo "     统计文件中的单词次数且逆序展示 -->   ftool -a filename               "
+echo "     替换文本中的旧字符串（全局替换)-->   ftool -r oldstr newstr filename "
+echo "     统计一个路径下有多少个文件     -->   ftool -f path                   "
+echo "     统计一个文件里的关键字数量     -->   ftool -f filepath keyword       "
+echo "#################################################################         "
+exit
+}
+
+if [[ $1 == "" ]]
+then
+usage
+fi
+
+errorMessage(){
+echo "使用的方式有误，请使用htool 或者htool -h查看使用方法"
+exit
+}
+
+countFile(){
+ if [ ! -d $filepath ]
+ then
+ echo "$filepath不是一个目录，请重新输入"
+  
+ else 
+ fileCount=$(ls -lR $filepath |wc -l )
+ echo "$filepath路径下一共有$fileCount个文件"
+ fi
+ exit
+}
+
+replace(){
+
+sed -i "s/$oldStr/$newStr/g" $fileName
+echo "   全局替换成功"
+}
+countWords(){ 
+        if [  ! -f $filepath  ]
+        then 
+        echo "$filepath 不是一个文件，请重新输入"
+        else
+	count=$(cat $filepath | tr -s ' ' '\n' | grep $keyword |  wc -l )
+        echo "$keyword在$filepath文件里的数量是$count个"      
+        fi 
+        exit                
+}
+
+
+while getopts ":-a :-b :-c :-h :-f :-r" opt 
+do
+    case $opt in
+        a)
+        if [ ! -f $2 ]
+	then 
+	errorMessage
+        
+        else
+        echo "以下为文件中各个单词的次数统计，由多到少倒序"
+        fi
+        cat $2  | tr -s ' ' '\n' | uniq -c | sort -nr
+        ;;
+        b)
+        echo "参数b的值$OPTARG"
+        ;;
+        c)
+        echo "参数c的值$OPTARG"
+        ;;
+        r)
+        
+        oldStr=$2
+        newStr=$3
+        fileName=$4
+        replace
+        ;;
+	h)
+        usage
+        ;;
+	f)
+         filepath=$2
+         keyword=$3
+         
+         if [[   $3 == "" ]]
+         then 
+         countFile
+         fi
+   
+         if [ ! $4 == "" ]
+         then 
+         errorMessage
+         else
+         countWords
+         fi
+         exit
+        ;;
+        ?)
+        echo "未知参数"
+        exit 1;;
+    esac
+done 
+
+
+
+
+
